@@ -4,7 +4,7 @@ import os
 import asyncio
 from edge_tts import Communicate
 
-# --- 1. ตั้งค่าชื่อไฟล์ (ใช้ชื่อไฟล์ตรงๆ เพราะทุกอย่างอยู่ใน GitHub โฟลเดอร์เดียวกัน) ---
+# --- 1. ตั้งค่าชื่อไฟล์ ---
 MAIN_FILE = "vocabulary_China_game.txt"
 CORRECT_FILE = "correct_china.txt"
 WRONG_FILE = "wrong_china.txt"
@@ -18,27 +18,27 @@ def load_data(path):
             for line in f:
                 p = line.strip().split(',')
                 if len(p) == 3:
-                    # จีน, พินอิน, ไทย
                     data.append({"word": p[0].strip(), "pinyin": p[1].strip(), "mean": p[2].strip()})
     return data
 
 def save_to_file(item, target):
-    # ใน Streamlit Cloud ไฟล์จะบันทึกชั่วคราว (ถ้าเน้นเก็บถาวรต้องต่อ Database ภายหลัง)
     existing = [v['word'] for v in load_data(target)]
     if item['word'] not in existing:
         with open(target, 'a', encoding='utf-8') as f:
             f.write(f"{item['word']},{item['pinyin']},{item['mean']}\n")
 
-async def get_voice(text, voice_type):
+# ฟังก์ชันเล่นเสียง (เพิ่มระบบ Slow Rate)
+async def get_voice(text, voice_type, slow=False):
     voice = "zh-CN-XiaoxiaoNeural" if voice_type == "f" else "zh-CN-YunxiNeural"
-    comm = Communicate(text, voice)
+    # ปรับความเร็วเสียง: ถ้าช้าให้ใช้ -25%
+    rate = "-25%" if slow else "+0%"
+    comm = Communicate(text, voice, rate=rate)
     await comm.save(TEMP_AUDIO)
 
 # --- 3. ตั้งค่าหน้าเว็บ ---
-st.set_page_config(page_title="Chinese Vocab Web", page_icon="🇨🇳")
+st.set_page_config(page_title="Chinese Vocab Master", page_icon="🇨🇳")
 st.title("🇨🇳 Chinese Vocab Master")
 
-# ใช้ Session State เก็บค่าตัวแปรเพื่อให้เว็บไม่รีเซ็ตข้อมูลทุกครั้งที่กดปุ่ม
 if 'game_data' not in st.session_state:
     st.session_state.game_data = load_data(MAIN_FILE)
     random.shuffle(st.session_state.game_data)
@@ -68,19 +68,23 @@ if st.session_state.current_item is None:
 item = st.session_state.current_item
 
 if item:
-    # แสดงตัวจีนและพินอิน (ซ่อน/แสดง ตามสถานะ)
+    # แสดงตัวจีนและพินอิน
     display_word = item['word'] if st.session_state.show_hint else "???"
     display_pinyin = item['pinyin'] if st.session_state.show_hint else "???"
     
     st.markdown(f"<h1 style='text-align: center; color: #d32f2f; font-size: 80px;'>{display_word}</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align: center; font-size: 24px; font-style: italic;'>{display_pinyin}</p>", unsafe_allow_html=True)
 
-    # ปุ่มฟังเสียง
-    c1, c2, c3 = st.columns([1, 2, 1])
-    with c2:
-        if st.button("🔊 ฟังเสียงภาษาจีน", use_container_width=True):
-            asyncio.run(get_voice(item['word'], st.session_state.voice_type))
-            st.audio(TEMP_AUDIO, format="audio/mp3")
+    # --- ปุ่มฟังเสียง (ปกติ และ ช้า) ---
+    col_v1, col_v2 = st.columns(2)
+    with col_v1:
+        if st.button("🔊 ฟังปกติ (R)", use_container_width=True):
+            asyncio.run(get_voice(item['word'], st.session_state.voice_type, slow=False))
+            st.audio(TEMP_AUDIO, format="audio/mp3", autoplay=True)
+    with col_v2:
+        if st.button("🐢 ฟังช้าๆ (S)", use_container_width=True):
+            asyncio.run(get_voice(item['word'], st.session_state.voice_type, slow=True))
+            st.audio(TEMP_AUDIO, format="audio/mp3", autoplay=True)
 
     st.divider()
 
@@ -98,7 +102,7 @@ if item:
                     st.error(f"ยังไม่ถูก! ลองฟังเสียงอีกครั้ง")
                     save_to_file(item, WRONG_FILE)
 
-    # โหมดฝึกสะกด (หลังตอบถูก)
+    # โหมดฝึกสะกด
     if st.session_state.mode == "spell":
         st.success(f"ถูกต้อง! ความหมายคือ: {item['mean']}")
         st.info(f"ฝึกพิมพ์สะกด: {item['word']} หรือ {item['pinyin']}")
@@ -110,15 +114,17 @@ if item:
                     next_question()
                     st.rerun()
             else:
-                st.warning("สะกดไม่ตรงครับ ลองดูคำใบ้ด้านบน")
+                st.warning("สะกดยังไม่ตรงครับ ลองดูคำใบ้ด้านบน")
 
     # แถบควบคุมด้านข้าง
     with st.sidebar:
         st.header("การตั้งค่า")
-        st.session_state.voice_type = st.radio("เลือกเสียง", ("f", "m"), format_func=lambda x: "ผู้หญิง (Xiaoxiao)" if x=="f" else "ผู้ชาย (Yunxi)")
-        if st.button("👁️ แสดงคำใบ้ (ตัวจีน)"):
+        st.session_state.voice_type = st.radio("เลือกเสียง", ("f", "m"), format_func=lambda x: "ผู้หญิง" if x=="f" else "ผู้ชาย")
+        if st.button("👁️ แสดงคำใบ้ (H)"):
             st.session_state.show_hint = True
             st.rerun()
         if st.button("⏭️ ข้ามคำนี้"):
             next_question()
             st.rerun()
+        st.divider()
+        st.write("สถิติไฟล์จะถูกบันทึกชั่วคราวบน Server")
