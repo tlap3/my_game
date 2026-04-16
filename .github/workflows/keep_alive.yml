@@ -1,0 +1,21 @@
+name: Keep Streamlit Alive (Every 2 Hours)
+
+on:
+  schedule:
+    # รันทุกๆ 2 ชั่วโมง (นาทีที่ 0 ของทุก 2 ชม.)
+    - cron: '0 */2 * * *'
+  workflow_dispatch: # ปุ่มกดรันเองได้ด้วยมือ (Manual)
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create empty commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git commit --allow-empty -m "Keep-alive commit: $(date)"
+          git push
