@@ -3,16 +3,16 @@
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- ใช้ตัวรันมาตรฐานของ Pygame-web -->
-    <script src="https://pygame-web.github.io/archives/0.9/pythons.js"></script>
+    <!-- ✅ เรียกใช้ไฟล์ pythons.js ที่อยู่ใน Repository ของคุณเอง -->
+    <script src="pythons.js"></script>
 </head>
 <body style="margin:0; background-color:black; color:lime; display:flex; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
     <div id="status">⏳ กำลังเชื่อมต่อเครื่องยนต์...</div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        // ฟังก์ชันนี้จะทำงานซ้ำๆ จนกว่าเครื่องยนต์จะพร้อม
         let checkEngine = setInterval(() => {
+            // ตรวจสอบว่าไฟล์ pythons.js ในเครื่องทำงานหรือยัง
             if (window.AsyncPython || window.python) {
                 clearInterval(checkEngine);
                 const engine = window.AsyncPython || window.python;
@@ -21,10 +21,9 @@
             }
         }, 500);
 
-        // ป้องกันหน้าค้าง ถ้าผ่านไป 10 วินาทีแล้วยังไม่โหลด
         setTimeout(() => {
             if (document.getElementById('status').innerHTML === "⏳ กำลังเชื่อมต่อเครื่องยนต์...") {
-                document.getElementById('status').innerHTML = "❌ ระบบขัดข้อง - กรุณาเช็คอินเทอร์เน็ตหรือเปิดผ่านมือถือ";
+                document.getElementById('status').innerHTML = "❌ ระบบขัดข้อง - ไม่พบไฟล์ pythons.js ในหน้าแรก";
             }
         }, 10000);
     </script>
