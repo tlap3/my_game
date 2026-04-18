@@ -2,9 +2,9 @@ name: Keep All My Apps Alive (Every 2 Hours)
 
 on:
   schedule:
-    # รันทุกๆ 2 ชั่วโมง (00:00, 02:00, 04:00 ... เป็นต้น)
+    # รันทุกๆ 2 ชั่วโมง
     - cron: '0 */2 * * *'
-  workflow_dispatch:      # ปุ่มกดรันเองเพื่อทดสอบในหน้า Actions
+  workflow_dispatch:      # ปุ่มกดรันเองเพื่อทดสอบ
 
 jobs:
   keep-alive:
@@ -13,13 +13,13 @@ jobs:
       - name: Ping All Streamlit Apps
         run: |
           echo "กำลังปลุกแอปศูนย์กลาง (Hub)..."
-          curl -L -I "https://tlap03.streamlit.app/"
+          curl -s -m 30 "https://tlap03.streamlit.app/" > /dev/null || echo "Hub อาจจะหลับอยู่แต่สะกิดแล้ว"
           
           echo "กำลังปลุกแอปคำศัพท์จีน..."
-          curl -L -I "https://tlap03-chinese-vocab-app.streamlit.app/"
+          curl -s -m 30 "https://tlap03-chinese-vocab-app.streamlit.app/" > /dev/null || echo "แอปศัพท์จีนอาจจะหลับอยู่แต่สะกิดแล้ว"
           
           echo "กำลังปลุกหน้าเกมยิง (GitHub Pages)..."
-          curl -L -I "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/"
+          curl -s -m 30 "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/" > /dev/null
 
       - name: Status Check
         run: echo "ปลุกทุกแอปเรียบร้อยแล้วเมื่อเวลา $(date)"
