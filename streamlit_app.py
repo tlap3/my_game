@@ -57,7 +57,7 @@ if 'active_url' in st.session_state:
     # กรณีเป็นแอป Streamlit (ต้องใช้ปุ่มกดเปิดหน้าใหม่)
     if ".streamlit.app" in st.session_state.active_url:
         st.warning("⚠️ แอป Streamlit ไม่รองรับการแสดงผลซ้อนในหน้านี้ (Security Policy)")
-        st.write("กรุณากดปุ่มด้านบนเพื่อเข้าสู่แอปโดยตรงครับ")
+        st.write("กรุณากดปุ่มด้านล้างนี้เพื่อเข้าสู่แอปโดยตรงครับ")
         st.link_button(f"👉 คลิกเพื่อเปิดแอป {st.session_state.active_title}", st.session_state.active_url, use_container_width=True)
         
         # แสดงหน้าต่างเปล่าๆ ไว้เพื่อให้รู้ว่ามีแอปอยู่
