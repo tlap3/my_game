@@ -1,26 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>Target Mania: Boss Alert</title>
-    <style>
-        body { margin: 0; background-color: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        #canvas { border: 2px solid #333; }
-    </style>
-    <!-- ดึงตัวรันจาก CDN ของ Pygame-web -->
     <script src="https://github.io"></script>
 </head>
-<body>
-    <!-- ส่วนแสดงผลเกม -->
-    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="1"></canvas>
-
+<body style="margin:0; background-color:black;">
+    <canvas id="canvas" style="width:100%; height:100vh;"></canvas>
     <script>
-        // ตั้งค่าการรันเกม
-        window.onload = function() {
-            // สั่งให้รันโดยดึงไฟล์ setup.tar.gz ของคุณมาใช้
-            // หากไฟล์ของคุณชื่ออื่น ให้แก้ชื่อตรง "setup.tar.gz" ให้ตรงกัน
-            window.AsyncPython.run("canvas", "setup.tar.gz");
-        };
+        // บังคับให้ระบบโหลดไฟล์ setup.tar.gz ทันทีที่เปิดหน้าเว็บ
+        window.addEventListener("load", () => {
+            if (window.AsyncPython) {
+                window.AsyncPython.run("canvas", "setup.tar.gz");
+            }
+        });
     </script>
 </body>
 </html>
