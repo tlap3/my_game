@@ -2,42 +2,29 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Target Mania</title>
-    <!-- ใช้ตัวรันสำรองจาก jsDelivr ซึ่งเป็นเซิร์ฟเวอร์ความเร็วสูงและเข้าถึงได้ง่ายกว่า -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- เรียกไฟล์ที่เราเพิ่งสร้างไว้ใน GitHub ของเราเอง -->
+    <script src="pythons.js"></script>
 </head>
-<body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace; text-align:center;">
-
-    <div id="status">🚀 กำลังเตรียมระบบเกม...</div>
-    <div id="progress" style="display:none; color:cyan; margin-top:10px;">📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...</div>
-    
-    <canvas id="canvas" style="display:none; border:2px solid #333;"></canvas>
-
+<body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
+    <div id="status">🚀 กำลังเชื่อมต่อเครื่องยนต์เกม...</div>
+    <canvas id="canvas" style="display:none;"></canvas>
     <script>
-        const status = document.getElementById('status');
-        const progress = document.getElementById('progress');
-        const canvas = document.getElementById('canvas');
-
         window.addEventListener("load", async () => {
-            // หน่วงเวลาเล็กน้อยเพื่อให้ตัวรัน Engine พร้อมทำงาน
+            // หน่วงเวลา 2 วินาทีเพื่อให้สคริปต์พร้อม
             setTimeout(async () => {
-                if (window.AsyncPython) {
-                    status.style.display = "none";
-                    progress.style.display = "block";
-                    
+                if (typeof window.AsyncPython !== 'undefined' || window.python) {
+                    document.getElementById('status').innerHTML = "📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...";
                     try {
-                        // สั่งรันไฟล์เกมของคุณ
-                        await window.AsyncPython.run("canvas", "setup.tar.gz");
-                        progress.style.display = "none";
-                        canvas.style.display = "block";
+                        const engine = window.AsyncPython || window.python;
+                        await engine.run("canvas", "setup.tar.gz");
+                        document.getElementById('status').style.display = "none";
+                        document.getElementById('canvas').style.display = "block";
                     } catch (e) {
-                        status.style.display = "block";
-                        status.innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz หรือไฟล์เสีย";
-                        console.error(e);
+                        document.getElementById('status').innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz";
                     }
                 } else {
-                    status.innerHTML = "❌ ระบบล้มเหลว กรุณากด Refresh (Ctrl+F5)";
+                    document.getElementById('status').innerHTML = "❌ ระบบยังไม่พร้อม กรุณากด Ctrl+F5";
                 }
             }, 2000);
         });
