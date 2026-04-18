@@ -3,27 +3,30 @@
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- ✅ เรียกใช้ไฟล์ pythons.js ที่อยู่ใน Repository ของคุณเอง -->
-    <script src="pythons.js"></script>
+    <!-- เรียกไฟล์ pythons.js จากใน GitHub ของคุณเอง -->
+    <script src="./pythons.js"></script>
 </head>
 <body style="margin:0; background-color:black; color:lime; display:flex; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
     <div id="status">⏳ กำลังเชื่อมต่อเครื่องยนต์...</div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
+        // ระบบตรวจสอบซ้ำทุก 0.5 วินาที
         let checkEngine = setInterval(() => {
-            // ตรวจสอบว่าไฟล์ pythons.js ในเครื่องทำงานหรือยัง
-            if (window.AsyncPython || window.python) {
+            const engine = window.AsyncPython || window.python;
+            if (engine) {
                 clearInterval(checkEngine);
-                const engine = window.AsyncPython || window.python;
                 document.getElementById('status').innerHTML = "📦 กำลังโหลดเกม (1.6 MB)...";
                 engine.run("canvas", "setup.tar.gz");
             }
         }, 500);
 
+        // ถ้า 10 วินาทียังไม่มา ให้รีโหลดหน้าอัตโนมัติ 1 ครั้งเพื่อแก้ปัญหา Cache
         setTimeout(() => {
-            if (document.getElementById('status').innerHTML === "⏳ กำลังเชื่อมต่อเครื่องยนต์...") {
-                document.getElementById('status').innerHTML = "❌ ระบบขัดข้อง - ไม่พบไฟล์ pythons.js ในหน้าแรก";
+            const engine = window.AsyncPython || window.python;
+            if (!engine) {
+                document.getElementById('status').innerHTML = "🔄 กำลังลองเชื่อมต่อใหม่อีกครั้ง...";
+                location.reload();
             }
         }, 10000);
     </script>
