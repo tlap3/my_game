@@ -3,19 +3,33 @@
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- ใช้ CDN ของ Pygame-web เวอร์ชันที่เสถียร -->
+    <!-- เปลี่ยนเป็นลิงก์ CDN ตัวใหม่ที่เสถียรและเร็วขึ้น -->
     <script src="https://github.io"></script>
 </head>
-<body style="margin:0; background-color:black; overflow:hidden;">
-    <canvas id="canvas" style="width:100%; height:100vh;"></canvas>
+<body style="margin:0; background-color:black; overflow:hidden; display:flex; justify-content:center; align-items:center; height:100vh; color:white; font-family:sans-serif;">
+
+    <!-- ส่วนแสดงสถานะการโหลด -->
+    <div id="status" style="position:absolute;">Loading Python Engine...</div>
+    
+    <canvas id="canvas" style="display:none;"></canvas>
+
     <script>
+        const status = document.getElementById('status');
+        const canvas = document.getElementById('canvas');
+
         window.addEventListener("load", () => {
-            // สั่งรันโดยระบุไฟล์ setup.tar.gz
             if (window.AsyncPython) {
-                console.log("Starting game...");
-                window.AsyncPython.run("canvas", "setup.tar.gz");
+                status.innerHTML = "Downloading Game Assets (setup.tar.gz)...";
+                console.log("Python Engine found. Starting game...");
+                
+                // สั่งรันเกม
+                window.AsyncPython.run("canvas", "setup.tar.gz").then(() => {
+                    status.style.display = "none";
+                    canvas.style.display = "block";
+                });
             } else {
-                console.error("Python Engine not loaded");
+                status.innerHTML = "❌ Error: Python Engine not loaded. Please refresh.";
+                console.error("Critical Error: pythons.js failed to load.");
             }
         });
     </script>
