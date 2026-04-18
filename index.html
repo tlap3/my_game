@@ -3,32 +3,45 @@
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- เรียกไฟล์ pythons.js จากใน GitHub ของคุณเอง -->
-    <script src="./pythons.js"></script>
+    <!-- ใช้ CDN สำรองที่โหลดง่ายที่สุด (ห้ามลบบรรทัดนี้) -->
+    <script src="https://jsdelivr.net"></script>
 </head>
-<body style="margin:0; background-color:black; color:lime; display:flex; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
-    <div id="status">⏳ กำลังเชื่อมต่อเครื่องยนต์...</div>
-    <canvas id="canvas" style="display:none;"></canvas>
+<body style="margin:0; background-color:black; color:lime; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace; text-align:center;">
+
+    <div id="status">⏳ กำลังสตาร์ทเครื่องยนต์...</div>
+    <div id="progress" style="display:none; color:cyan; margin-top:10px;">📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...</div>
+    
+    <canvas id="canvas" style="display:none; border:2px solid #333;"></canvas>
 
     <script>
-        // ระบบตรวจสอบซ้ำทุก 0.5 วินาที
-        let checkEngine = setInterval(() => {
-            const engine = window.AsyncPython || window.python;
-            if (engine) {
-                clearInterval(checkEngine);
-                document.getElementById('status').innerHTML = "📦 กำลังโหลดเกม (1.6 MB)...";
-                engine.run("canvas", "setup.tar.gz");
-            }
-        }, 500);
+        async function start() {
+            const status = document.getElementById('status');
+            const progress = document.getElementById('progress');
+            const canvas = document.getElementById('canvas');
 
-        // ถ้า 10 วินาทียังไม่มา ให้รีโหลดหน้าอัตโนมัติ 1 ครั้งเพื่อแก้ปัญหา Cache
-        setTimeout(() => {
-            const engine = window.AsyncPython || window.python;
-            if (!engine) {
-                document.getElementById('status').innerHTML = "🔄 กำลังลองเชื่อมต่อใหม่อีกครั้ง...";
-                location.reload();
+            // รอเครื่องยนต์สูงสุด 10 วินาที
+            for (let i = 0; i < 20; i++) {
+                if (window.AsyncPython || window.python) {
+                    const engine = window.AsyncPython || window.python;
+                    status.style.display = "none";
+                    progress.style.display = "block";
+                    try {
+                        // สั่งรันไฟล์เกมของคุณ
+                        await engine.run("canvas", "setup.tar.gz");
+                        progress.style.display = "none";
+                        canvas.style.display = "block";
+                        return;
+                    } catch (e) {
+                        progress.innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz";
+                        return;
+                    }
+                }
+                await new Promise(r => setTimeout(r, 500)); // รอทีละ 0.5 วินาที
             }
-        }, 10000);
+            status.innerHTML = "❌ เครื่องยนต์ไม่ตอบสนอง (Timeout)<br>กรุณาใช้เน็ตมือถือทดสอบ หรือกด Ctrl+F5";
+        }
+
+        window.onload = start;
     </script>
 </body>
 </html>
