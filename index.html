@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>Target Mania</title>
+    <!-- ใช้ CDN ของ Pygame-web เวอร์ชันที่เสถียร -->
     <script src="https://github.io"></script>
 </head>
-<body style="margin:0; background-color:black;">
+<body style="margin:0; background-color:black; overflow:hidden;">
     <canvas id="canvas" style="width:100%; height:100vh;"></canvas>
     <script>
-        // บังคับให้ระบบโหลดไฟล์ setup.tar.gz ทันทีที่เปิดหน้าเว็บ
         window.addEventListener("load", () => {
+            // สั่งรันโดยระบุไฟล์ setup.tar.gz
             if (window.AsyncPython) {
+                console.log("Starting game...");
                 window.AsyncPython.run("canvas", "setup.tar.gz");
+            } else {
+                console.error("Python Engine not loaded");
             }
         });
     </script>
