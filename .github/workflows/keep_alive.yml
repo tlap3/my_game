@@ -1,21 +1,25 @@
-name: Keep Streamlit Alive (Every 2 Hours)
+name: Keep All My Apps Alive (Every 2 Hours)
 
 on:
   schedule:
-    # รันทุกๆ 2 ชั่วโมง (นาทีที่ 0 ของทุก 2 ชม.)
+    # รันทุกๆ 2 ชั่วโมง (00:00, 02:00, 04:00 ... เป็นต้น)
     - cron: '0 */2 * * *'
-  workflow_dispatch: # ปุ่มกดรันเองได้ด้วยมือ (Manual)
+  workflow_dispatch:      # ปุ่มกดรันเองเพื่อทดสอบในหน้า Actions
 
 jobs:
-  auto_commit:
+  keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Create empty commit
+      - name: Ping All Streamlit Apps
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
-          git commit --allow-empty -m "Keep-alive commit: $(date)"
-          git push
+          echo "กำลังปลุกแอปศูนย์กลาง (Hub)..."
+          curl -L -I "https://tlap03.streamlit.app/"
+          
+          echo "กำลังปลุกแอปคำศัพท์จีน..."
+          curl -L -I "https://tlap03-chinese-vocab-app.streamlit.app/"
+          
+          echo "กำลังปลุกหน้าเกมยิง (GitHub Pages)..."
+          curl -L -I "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/"
+
+      - name: Status Check
+        run: echo "ปลุกทุกแอปเรียบร้อยแล้วเมื่อเวลา $(date)"
