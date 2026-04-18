@@ -14,7 +14,7 @@ GAMES_DATA = [
     },
     {
         "title": "📖 Chinese Vocab Master",
-        "url": "https://tlap03.streamlit.app/", # !!! เปลี่ยนเป็น URL จริงของแอปศัพท์จีนที่คุณเพิ่งรัน !!!
+        "url": "tlap03-chinese-vocab-app", # !!! เปลี่ยนเป็น URL จริงของแอปศัพท์จีนที่คุณเพิ่งรัน !!!
         "desc": "ฝึกศัพท์จีนด้วยเสียงอ่านจาก AI พร้อมโหมดสะกด"
     }
 ]
