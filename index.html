@@ -1,47 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Target Mania</title>
-    <!-- ใช้ CDN สำรองที่เสถียรที่สุดสำหรับเวอร์ชัน 0.9.x -->
-    <script src="https://github.io"></script>
+    <!-- ใช้ตัวรันสำรองจาก jsDelivr ซึ่งเป็นเซิร์ฟเวอร์ความเร็วสูงและเข้าถึงได้ง่ายกว่า -->
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace; text-align:center;">
 
-    <div id="status">🚀 Initializing Game System...</div>
-    <div id="progress_bar" style="width:200px; height:10px; background:#333; margin-top:10px; display:none;">
-        <div id="progress_fill" style="width:0%; height:100%; background:#00ff00;"></div>
-    </div>
+    <div id="status">🚀 กำลังเตรียมระบบเกม...</div>
+    <div id="progress" style="display:none; color:cyan; margin-top:10px;">📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...</div>
     
-    <canvas id="canvas" style="display:none; border:2px solid #222;"></canvas>
+    <canvas id="canvas" style="display:none; border:2px solid #333;"></canvas>
 
     <script>
         const status = document.getElementById('status');
-        const progress_bar = document.getElementById('progress_bar');
-        const progress_fill = document.getElementById('progress_fill');
+        const progress = document.getElementById('progress');
         const canvas = document.getElementById('canvas');
 
-        // ฟังก์ชันเริ่มรันระบบ
         window.addEventListener("load", async () => {
-            if (typeof window.AsyncPython !== 'undefined') {
-                status.innerHTML = "📦 Downloading Assets (setup.tar.gz)...";
-                progress_bar.style.display = "block";
-                
-                try {
-                    // รันไฟล์ก้อนใหญ่ของคุณ
-                    await window.AsyncPython.run("canvas", "setup.tar.gz");
+            // หน่วงเวลาเล็กน้อยเพื่อให้ตัวรัน Engine พร้อมทำงาน
+            setTimeout(async () => {
+                if (window.AsyncPython) {
                     status.style.display = "none";
-                    progress_bar.style.display = "none";
-                    canvas.style.display = "block";
-                } catch (e) {
-                    status.innerHTML = "❌ Error: Failed to load setup.tar.gz";
-                    console.error(e);
+                    progress.style.display = "block";
+                    
+                    try {
+                        // สั่งรันไฟล์เกมของคุณ
+                        await window.AsyncPython.run("canvas", "setup.tar.gz");
+                        progress.style.display = "none";
+                        canvas.style.display = "block";
+                    } catch (e) {
+                        status.style.display = "block";
+                        status.innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz หรือไฟล์เสีย";
+                        console.error(e);
+                    }
+                } else {
+                    status.innerHTML = "❌ ระบบล้มเหลว กรุณากด Refresh (Ctrl+F5)";
                 }
-            } else {
-                status.innerHTML = "⚠️ Engine not ready. Retrying...";
-                setTimeout(() => { location.reload(); }, 3000); // รีโหลดอัตโนมัติใน 3 วินาที
-            }
+            }, 2000);
         });
     </script>
 </body>
