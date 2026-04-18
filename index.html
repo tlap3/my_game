@@ -1,47 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <script src="pythons.js"></script>
+    <!-- ใช้ตัวรันตรงๆ จากแหล่งที่เสถียรที่สุด -->
+    <script src="https://github.io"></script>
 </head>
-<body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace; text-align:center;">
-
-    <div id="status">⏳ กำลังปลุกเครื่องยนต์เกม...</div>
-    <div id="progress" style="display:none; color:cyan; margin-top:10px;">📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...</div>
+<body style="margin:0; background-color:black; color:lime; display:flex; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
+    
+    <div id="status">⏳ กำลังโหลด...</div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        const status = document.getElementById('status');
-        const progress = document.getElementById('progress');
-        const canvas = document.getElementById('canvas');
-
-        let retryCount = 0;
-        async function tryStart() {
-            // เช็คว่าเครื่องยนต์มาหรือยัง
-            const engine = window.AsyncPython || window.python;
-            if (engine) {
-                status.style.display = "none";
-                progress.style.display = "block";
-                try {
-                    await engine.run("canvas", "setup.tar.gz");
-                    progress.style.display = "none";
-                    canvas.style.display = "block";
-                } catch (e) {
-                    progress.innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz ใน GitHub";
-                }
+        window.onload = function() {
+            // เช็คว่าระบบ Python พร้อมไหม
+            if (window.AsyncPython) {
+                document.getElementById('status').innerHTML = "📦 Loading setup.tar.gz...";
+                window.AsyncPython.run("canvas", "setup.tar.gz");
             } else {
-                retryCount++;
-                if (retryCount < 10) {
-                    status.innerHTML = `⏳ พยายามเชื่อมต่อครั้งที่ ${retryCount}...`;
-                    setTimeout(tryStart, 2000); // รอ 2 วินาทีแล้วลองใหม่
-                } else {
-                    status.innerHTML = "❌ ระบบไม่ตอบสนอง กรุณากด Ctrl+F5 แรงๆ หนึ่งครั้ง";
-                }
+                document.getElementById('status').innerHTML = "❌ Engine Error - ลองเปลี่ยนเน็ตหรือกด Ctrl+F5";
             }
-        }
-
-        window.addEventListener("load", tryStart);
+        };
     </script>
 </body>
 </html>
