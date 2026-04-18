@@ -1,33 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- เรียกไฟล์ที่เราเพิ่งสร้างไว้ใน GitHub ของเราเอง -->
     <script src="pythons.js"></script>
 </head>
-<body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
-    <div id="status">🚀 กำลังเชื่อมต่อเครื่องยนต์เกม...</div>
+<body style="margin:0; background-color:black; color:#00ff00; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:monospace; text-align:center;">
+
+    <div id="status">⏳ กำลังปลุกเครื่องยนต์เกม...</div>
+    <div id="progress" style="display:none; color:cyan; margin-top:10px;">📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...</div>
     <canvas id="canvas" style="display:none;"></canvas>
+
     <script>
-        window.addEventListener("load", async () => {
-            // หน่วงเวลา 2 วินาทีเพื่อให้สคริปต์พร้อม
-            setTimeout(async () => {
-                if (typeof window.AsyncPython !== 'undefined' || window.python) {
-                    document.getElementById('status').innerHTML = "📦 กำลังโหลดไฟล์เกม (setup.tar.gz)...";
-                    try {
-                        const engine = window.AsyncPython || window.python;
-                        await engine.run("canvas", "setup.tar.gz");
-                        document.getElementById('status').style.display = "none";
-                        document.getElementById('canvas').style.display = "block";
-                    } catch (e) {
-                        document.getElementById('status').innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz";
-                    }
-                } else {
-                    document.getElementById('status').innerHTML = "❌ ระบบยังไม่พร้อม กรุณากด Ctrl+F5";
+        const status = document.getElementById('status');
+        const progress = document.getElementById('progress');
+        const canvas = document.getElementById('canvas');
+
+        let retryCount = 0;
+        async function tryStart() {
+            // เช็คว่าเครื่องยนต์มาหรือยัง
+            const engine = window.AsyncPython || window.python;
+            if (engine) {
+                status.style.display = "none";
+                progress.style.display = "block";
+                try {
+                    await engine.run("canvas", "setup.tar.gz");
+                    progress.style.display = "none";
+                    canvas.style.display = "block";
+                } catch (e) {
+                    progress.innerHTML = "❌ ไม่พบไฟล์ setup.tar.gz ใน GitHub";
                 }
-            }, 2000);
-        });
+            } else {
+                retryCount++;
+                if (retryCount < 10) {
+                    status.innerHTML = `⏳ พยายามเชื่อมต่อครั้งที่ ${retryCount}...`;
+                    setTimeout(tryStart, 2000); // รอ 2 วินาทีแล้วลองใหม่
+                } else {
+                    status.innerHTML = "❌ ระบบไม่ตอบสนอง กรุณากด Ctrl+F5 แรงๆ หนึ่งครั้ง";
+                }
+            }
+        }
+
+        window.addEventListener("load", tryStart);
     </script>
 </body>
 </html>
