@@ -14,7 +14,7 @@ st.set_page_config(
 GAMES_DATA = [
     {
         "title": "🎯 Target Mania: Boss Alert",
-        "url": "https://github.io", 
+        "url": "tlap3.github.io", 
         "image": "https://placeholder.com",
         "desc": "เกมยิงเป้าท้าทายความไว พร้อมบอสสุดโหด! (รันผ่าน GitHub Pages)",
         "type": "game"
