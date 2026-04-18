@@ -3,26 +3,30 @@
 <head>
     <meta charset="utf-8">
     <title>Target Mania</title>
-    <!-- แก้จาก github.io เป็นชื่อไฟล์ pythons.js ที่เรามีใน Repository -->
-    <script src="pythons.js"></script>
+    <!-- ใช้ตัวรันมาตรฐานของ Pygame-web -->
+    <script src="https://github.io"></script>
 </head>
 <body style="margin:0; background-color:black; color:lime; display:flex; justify-content:center; align-items:center; height:100vh; font-family:monospace;">
-    
     <div id="status">⏳ กำลังเชื่อมต่อเครื่องยนต์...</div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        window.onload = function() {
-            // หน่วงเวลา 1 วินาทีให้ไฟล์ pythons.js ทำงานเสร็จก่อน
-            setTimeout(function() {
-                if (window.AsyncPython) {
-                    document.getElementById('status').innerHTML = "📦 Loading setup.tar.gz...";
-                    window.AsyncPython.run("canvas", "setup.tar.gz");
-                } else {
-                    document.getElementById('status').innerHTML = "❌ ไม่พบเครื่องยนต์ (pythons.js) - ตรวจสอบว่ามีไฟล์นี้ใน GitHub หรือยัง";
-                }
-            }, 1000);
-        };
+        // ฟังก์ชันนี้จะทำงานซ้ำๆ จนกว่าเครื่องยนต์จะพร้อม
+        let checkEngine = setInterval(() => {
+            if (window.AsyncPython || window.python) {
+                clearInterval(checkEngine);
+                const engine = window.AsyncPython || window.python;
+                document.getElementById('status').innerHTML = "📦 กำลังโหลดเกม (1.6 MB)...";
+                engine.run("canvas", "setup.tar.gz");
+            }
+        }, 500);
+
+        // ป้องกันหน้าค้าง ถ้าผ่านไป 10 วินาทีแล้วยังไม่โหลด
+        setTimeout(() => {
+            if (document.getElementById('status').innerHTML === "⏳ กำลังเชื่อมต่อเครื่องยนต์...") {
+                document.getElementById('status').innerHTML = "❌ ระบบขัดข้อง - กรุณาเช็คอินเทอร์เน็ตหรือเปิดผ่านมือถือ";
+            }
+        }, 10000);
     </script>
 </body>
 </html>
