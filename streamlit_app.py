@@ -21,7 +21,7 @@ GAMES_DATA = [
     },
     {
         "title": "📖 Chinese Vocab Master",
-        "url": "https://streamlit.app", 
+        "url": "https://tlap03-chinese-vocab-app.streamlit.app/", 
         "image": "https://placeholder.com",
         "desc": "ฝึกศัพท์จีนด้วยเสียงอ่านจาก AI พร้อมโหมดสะกด (รันผ่าน Streamlit Cloud)",
         "type": "app"
