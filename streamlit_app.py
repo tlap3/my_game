@@ -9,21 +9,23 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- 2. ฐานข้อมูลแอปและเกม (ตัวล่าสุดอยู่บนสุด) ---
-# หมายเหตุ: URL ของ Streamlit (.streamlit.app) จะเปิดใน iframe ไม่ได้ต้องใช้ปุ่มลิงก์
+# --- 2. ฐานข้อมูลแอปและเกม ---
+# ให้คุณนำ URL รูปภาพจริงๆ และลิงก์ YouTube มาใส่ในช่องด้านล่างนี้ครับ
 GAMES_DATA = [
     {
         "title": "🎯 Target Mania: Boss Alert",
         "url": "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/", 
-        "image": "https://placeholder.com",
-        "desc": "เกมยิงเป้าท้าทายความไว พร้อมบอสสุดโหด ! ",
+        "image": "https://img.itch.zone/aW1hZ2UvNDQ4MTIyMS8yNjcxOTg5OC5qcGc=/original/8X1OnI.jpg", # <--- ใส่ URL รูปภาพหน้าปกเกมของคุณ
+        "youtube": "https://youtu.be/oSYGz4ACYXY?si=_iZkxx6l2ht9Ccyv", # <--- ใส่ลิงก์ YouTube ของเกมนี้
+        "desc": "เกมยิงเป้าท้าทายความไว พร้อมบอสสุดโหด!",
         "type": "game"
     },
     {
         "title": "📖 Chinese Vocab Master",
         "url": "https://tlap03-chinese-vocab-app.streamlit.app/", 
-        "image": "https://placeholder.com",
-        "desc": "ฝึกศัพท์จีนด้วยเสียงอ่านจาก AI พร้อมโหมดสะกด ",
+        "image": "https://githubusercontent.com", # <--- ใส่ URL รูปภาพหน้าปกแอปศัพท์จีน
+        "youtube": "https://youtube.com", # <--- ใส่ลิงก์ YouTube ของแอปนี้
+        "desc": "ฝึกศัพท์จีนด้วยเสียงอ่านจาก AI พร้อมโหมดสะกด",
         "type": "app"
     }
 ]
@@ -39,46 +41,47 @@ cols = st.columns(2)
 for idx, item in enumerate(GAMES_DATA):
     with cols[idx % 2]:
         with st.container(border=True):
-            st.image(item["image"], use_container_width=True)
+            # แสดงรูปหน้าปก (ถ้ายังไม่มีรูปจริง จะใช้ Placeholder ไปก่อน)
+            st.image(item["image"], use_container_width=True, caption=item["title"])
+            
             st.subheader(item["title"])
             st.write(item["desc"])
             
-            # ปุ่มเลือกใช้งาน
-            if st.button(f"🚀 เลือก: {item['title']}", key=f"select_{idx}", use_container_width=True):
-                st.session_state.active_url = item["url"]
-                st.session_state.active_title = item["title"]
-                st.session_state.active_type = item["type"]
+            # สร้างคอลัมน์เล็กๆ สำหรับปุ่มเล่นเกมและปุ่ม YouTube
+            btn_col1, btn_col2 = st.columns([2, 1])
+            
+            with btn_col1:
+                if st.button(f"🚀 เลือก: {item['title']}", key=f"select_{idx}", use_container_width=True):
+                    st.session_state.active_url = item["url"]
+                    st.session_state.active_title = item["title"]
+                    st.session_state.active_type = item["type"]
+            
+            with btn_col2:
+                # ปุ่มลิงก์ไป YouTube
+                st.link_button("📺 ดูวิธีเล่น", item["youtube"], use_container_width=True)
 
 # --- 5. พื้นที่รันแอป/เกม (จะแสดงเมื่อมีการกดเลือก) ---
 if 'active_url' in st.session_state:
     st.write("---")
     st.header(f"🕹️ กำลังโหลด: {st.session_state.active_title}")
     
-    # กรณีเป็นแอป Streamlit (ต้องใช้ปุ่มกดเปิดหน้าใหม่)
     if ".streamlit.app" in st.session_state.active_url:
-        st.warning("⚠️ แอป Streamlit ไม่รองรับการแสดงผลซ้อนในหน้านี้ (Security Policy)")
-        st.write("กรุณากดปุ่มด้านล้างนี้เพื่อเข้าสู่แอปโดยตรงครับ")
+        st.warning("⚠️ แอป Streamlit ไม่รองรับการแสดงผลซ้อนในหน้านี้")
         st.link_button(f"👉 คลิกเพื่อเปิดแอป {st.session_state.active_title}", st.session_state.active_url, use_container_width=True)
+        st.info("แอปนี้จะเปิดขึ้นในแท็บใหม่ของ Browser")
         
-        # แสดงหน้าต่างเปล่าๆ ไว้เพื่อให้รู้ว่ามีแอปอยู่
-        st.info("แอปนี้จะเปิดขึ้นในแท็บใหม่ของ Browser ของคุณ")
-        
-    # กรณีเป็นเกมจาก GitHub Pages (รันผ่าน iframe ได้)
     else:
-        # ปุ่มทางเลือกเผื่อ iframe ไม่รัน
         st.link_button("🌐 หากเกมไม่โหลด (หรือต้องการเล่นแบบเต็มหน้าจอ) คลิกที่นี่", st.session_state.active_url)
-        
-        # แสดงผลผ่าน Iframe
         components.iframe(st.session_state.active_url, height=750, scrolling=True)
 
-    # ปุ่มปิดเพื่อกลับหน้าหลัก
     if st.button("❌ ปิดหน้าต่างนี้และกลับหน้าเมนูหลัก"):
         del st.session_state.active_url
         del st.session_state.active_title
         del st.session_state.active_type
         st.rerun()
 
-# --- 6. ส่วนท้ายหน้าเว็บ ---
-st.sidebar.title("📌 เกี่ยวกับ")
-st.sidebar.info("นี่คือศูนย์กลางการเรียนรู้และเกมที่พัฒนาโดย TLAP03")
-st.sidebar.write(f"จำนวนรายการทั้งหมด: {len(GAMES_DATA)}")
+# --- 6. Sidebar ---
+with st.sidebar:
+    st.title("📌 เกี่ยวกับ")
+    st.info("นี่คือศูนย์กลางการเรียนรู้และเกมที่พัฒนาโดย TLAP03")
+    st.write(f"จำนวนรายการทั้งหมด: {len(GAMES_DATA)}")
