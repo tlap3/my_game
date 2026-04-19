@@ -1,39 +1,37 @@
-name: Ultimate Keep Alive (3 Pages Immortal)
+name: Ultimate Keep Alive (Immortal App)
 
 on:
   schedule:
     - cron: '0 */2 * * *' # รันทุก 2 ชั่วโมง
-  workflow_dispatch:      # ปุ่มกดรันเองเพื่อทดสอบ
+  workflow_dispatch:      # กดรันเองได้ด้วยมือ
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
-    # สำคัญ: ต้องใส่ permissions เพื่อให้ Action มีสิทธิ์ส่ง Commit เปล่าได้
+    # เพิ่ม env บรรทัดนี้เพื่อลบคำเตือนเรื่อง Node.js 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    
     permissions:
       contents: write
       
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 # ตัวนี้ยังใช้ได้ดีที่สุดในปัจจุบันครับ
       
-      # 1. ปลุกด้วยการสะกิด URL (ทำทั้ง 3 หน้าตามของเดิมของคุณ)
       - name: Ping All Apps
         run: |
           echo "กำลังปลุกแอปศูนย์กลาง (Hub)..."
-          curl -s -m 30 "https://tlap03.streamlit.app/" > /dev/null || echo "Hub สะกิดแล้ว"
+          curl -s -m 30 "https://streamlit.app" > /dev/null || echo "Hub สะกิดแล้ว"
           
           echo "กำลังปลุกแอปคำศัพท์จีน..."
-          curl -s -m 30 "https://tlap03-chinese-vocab-app.streamlit.app/" > /dev/null || echo "ศัพท์จีนสะกิดแล้ว"
+          curl -s -m 30 "https://streamlit.app" > /dev/null || echo "ศัพท์จีนสะกิดแล้ว"
           
           echo "กำลังปลุกหน้าเกมยิง (GitHub Pages)..."
-          curl -s -m 30 "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/" > /dev/null
+          curl -s -m 30 "https://github.io" > /dev/null
           
-      # 2. ปลุกด้วยการสร้างการเคลื่อนไหวในโค้ด (วิธีไม้ตาย)
       - name: Create empty commit
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit --allow-empty -m "Immortal Ping: $(date)"
           git push
-          
-      - name: Status Check
-        run: echo "ปลุกและเขย่าบ้านเรียบร้อยแล้วเมื่อเวลา $(date)"
