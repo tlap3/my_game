@@ -1,154 +1,63 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    <title>setup</title>
+    <title>Target Mania Boss Alert</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-
-    <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
-
-    <!-- 1. โหลด BrowserFS ก่อนเป็นอันดับแรก -->
+    
+    <!-- แก้ไข Path และ URL ให้ถูกต้อง -->
     <script src="https://github.io"></script>
-
-    <!-- 2. โหลด Pythons.js และรันโค้ดเกม -->
-    <script src="https://github.io" type="module" id="site" data-python="python3.12" data-LINES=42 data-COLUMNS=132 data-os="vtx,snd,gui">
+    <script src="https://github.io" type="module" id="site" data-python="python3.12" data-os="vtx,snd,gui">
 #<!--
-print("""
-Loading setup from setup.apk
-    Pygbag Version : 0.9.3
-    Template Version : 0.9.3
-    Python  : 3.12
-    CDN URL : https://github.io
-    Screen  : 1280x720
-""")
-
-import sys
 import asyncio
 import platform
-import json
 from pathlib import Path
 
 async def custom_site():
     import embed
     platform.document.body.style.background = "#7f7f7f"
-    platform.window.transfer.hidden = True
-    platform.window.canvas.style.visibility = "visible"
-
+    
     bundle = "setup"
     appdir = Path(f"/data/data/{bundle}")
-    if not appdir.exists():
-        appdir.mkdir(parents=True)
+    if not appdir.exists(): appdir.mkdir(parents=True)
 
-    # ตรวจสอบการโหลดไฟล์ archive
-    if platform.window.location.host.find('.itch.zone') > 0:
-        import zipfile
-        async with platform.fopen("setup.apk", "rb") as archive:
-            with zipfile.ZipFile(archive) as zip_ref:
-                zip_ref.extractall(appdir.as_posix())
-    else:
+    # โหลดไฟล์เกม (ต้องมีไฟล์ setup.tar.gz อยู่คู่กับ index.html)
+    async with platform.fopen("setup.tar.gz", "rb") as archive:
         import tarfile
-        async with platform.fopen("setup.tar.gz", "rb") as archive:
-            tar = tarfile.open(fileobj=archive, mode="r:gz")
-            tar.extractall(path=appdir.as_posix(), filter='tar')
-            tar.close()
+        tar = tarfile.open(fileobj=archive, mode="r:gz")
+        tar.extractall(path=appdir.as_posix(), filter='tar')
+        tar.close()
 
     platform.run_main(PyConfig, loaderhome= appdir / "assets", loadermain=None)
 
-    while embed.counter()<0:
-        await asyncio.sleep(.1)
-
+    while embed.counter()<0: await asyncio.sleep(.1)
+    
     main = appdir / "assets" / "main.py"
-
     if not platform.window.MM.UME:
-        __import__(__name__).__file__ = main
-        msg  = "Ready to start ! Please click/touch page"
-        platform.window.infobox.innerText = msg
-        while not platform.window.MM.UME:
-            await asyncio.sleep(.1)
+        platform.window.infobox.innerText = "Ready to start! Click to play"
+        while not platform.window.MM.UME: await asyncio.sleep(.1)
 
-    await TopLevel_async_handler.start_toplevel(platform.shell, console=window.python.config.debug)
-    __import__(__name__).__file__ = main
-
-    def ui_callback(pkg):
-        platform.window.infobox.innerText = f"installing {pkg}"
-
-    await shell.source(main, callback=ui_callback)
+    await shell.source(main)
     platform.window.infobox.style.display = "none"
-    platform.window.config.gui_divider = 1
-    platform.window.window_resize()
-    shell.interactive()
 
 asyncio.run( custom_site() )
 # -->
     </script>
 
-    <script type="application/javascript">
-    config = {
-        xtermjs : "1" ,
-        _sdl2 : "canvas",
-        user_canvas : 0,
-        user_canvas_managed : 0,
-        gui_divider : 2,
-        ume_block : 1,
-        can_close : 0,
-        archive : "setup",
-        gui_debug : 2,
-        cdn : "https://github.io",
-        autorun : 0,
-        PYBUILD : "3.12",
-        fb_ar   :  1.77,
-        fb_width : "1280",
-        fb_height : "720"
-    }
-
-    function show_infobox() {
-        const infobox = document.getElementById("infobox");
-        infobox.style.display = "block";
-        const w = infobox.offsetWidth;
-        const h = infobox.offsetHeight;
-        infobox.style.left = (window.innerWidth - w) / 2 + "px";
-        infobox.style.top = (window.innerHeight - h) / 2 + "px";
-    }
-    </script>
-
     <style>
-        body { font-family: arial; margin: 0; background-color:powderblue; }
-        #status { display: inline-block; margin-top: 20px; margin-left: 30px; font-weight: bold; color: rgb(120, 120, 120); }
-        #progress { height: 20px; width: 300px; }
-        #infobox { position: fixed; background: green; color: white; font-weight: bold; padding: 12px 24px; z-index: 999999; }
-        canvas.emscripten { border: 0; background-color: transparent; width: 100%; height: 100%; z-index: 5; position: absolute; top: 0; left: 0; }
-        .bottomright { position:absolute; top: 40%; right: 0px; }
+        body { margin: 0; background-color: powderblue; font-family: arial; }
+        canvas.emscripten { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        #infobox { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                   background: green; color: white; padding: 20px; z-index: 999; font-weight: bold; }
     </style>
 </head>
-
 <body>
-    <div id="transfer" align=center>
-        <div class="emscripten" id="status">Downloading...</div>
-        <div class="emscripten">
-            <progress value="0" max="100" id="progress"></progress>
-        </div>
+    <div id="transfer" align="center">
+        <div id="status">Downloading assets...</div>
+        <progress value="0" max="100" id="progress"></progress>
     </div>
-
-    <canvas class="emscripten" id="canvas" width="1280" height="720" oncontextmenu="event.preventDefault()" tabindex=1></canvas>
-
-    <div id="infobox">Loading, please wait ...</div>
-
-    <div id="crt" class="bottomright">
-        <div id="system" hidden>
-            <button id="aiostop" disabled>AIO ⏏︎</button>
-            <button id="aiopaused_false" disabled>AIO ▶</button>
-        </div>
-    </div>
-
-    <script type="application/javascript">
-    async function custom_onload(debug_hidden) {
-        document.getElementById("transfer").hidden = debug_hidden;
-        show_infobox();
-    }
-    window.onload = function() { custom_onload(false); }
-    </script>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="1"></canvas>
+    <div id="infobox">Loading...</div>
 </body>
 </html>
