@@ -24,10 +24,10 @@ jobs:
           curl -s -m 30 "https://streamlit.app" > /dev/null || echo "Hub สะกิดแล้ว"
           
           echo "กำลังปลุกแอปคำศัพท์จีน..."
-          curl -s -m 30 "https://streamlit.app" > /dev/null || echo "ศัพท์จีนสะกิดแล้ว"
+          curl -s -m 30 "https://tlap03-chinese-vocab-app.streamlit.app/" > /dev/null || echo "ศัพท์จีนสะกิดแล้ว"
           
           echo "กำลังปลุกหน้าเกมยิง (GitHub Pages)..."
-          curl -s -m 30 "https://github.io" > /dev/null
+          curl -s -m 30 "https://tlap3.github.io/my_game/Target-Mania-Boss-Alert/" > /dev/null
           
       - name: Create empty commit
         run: |
